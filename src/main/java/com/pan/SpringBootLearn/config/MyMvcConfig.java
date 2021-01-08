@@ -6,8 +6,10 @@ springboot会获得容器中所有的WebMvcConfigurer 并调用其中的方法
 全面接管springMVC 加@enableWebMVc
 */
 
+import com.pan.SpringBootLearn.interceptor.MyInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -28,9 +30,16 @@ public class MyMvcConfig{
     @Bean
     public WebMvcConfigurer webMvcConfigurer(){
         return new WebMvcConfigurer() {
+            //视图控制器
             @Override
             public void addViewControllers(ViewControllerRegistry registry) {
                 registry.addViewController("/success2").setViewName("success");
+                registry.addViewController("/put").setViewName("put");
+            }
+
+            @Override
+            public void addInterceptors(InterceptorRegistry registry) {
+//                registry.addInterceptor(new MyInterceptor()).addPathPatterns("/**").excludePathPatterns("/hello");
             }
         };
     }
