@@ -6,3 +6,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     filters: stat,wall,slf4j
+
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.pan.SpringBootLearn.pojo

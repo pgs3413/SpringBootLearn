@@ -1,7 +1,11 @@
 package com.pan.SpringBootLearn.controller;
 
 import com.pan.SpringBootLearn.exception.UserNotExistException;
+import com.pan.SpringBootLearn.mapper.PeopleMapper;
 import com.pan.SpringBootLearn.pojo.Dog;
+import com.pan.SpringBootLearn.pojo.People;
+import com.pan.SpringBootLearn.service.PeopleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -46,5 +50,29 @@ public class TestController {
            throw new UserNotExistException();
         }
         return "success";
+    }
+
+    @Autowired
+    PeopleMapper peopleMapper;
+
+    @RequestMapping("/test05")
+    @ResponseBody
+    public People test05(People people){
+//        peopleMapper.insertPeople(people);
+        return people;
+    }
+    @RequestMapping("/test06/{id}")
+    @ResponseBody
+    public People test06(@PathVariable("id") Integer id){
+        return peopleMapper.getPeopleById(id);
+    }
+
+    @Autowired
+    PeopleService peopleService;
+
+    @RequestMapping("/test07/{id}")
+    @ResponseBody
+    public People test07(@PathVariable("id") Integer id){
+        return peopleService.getPeople(id);
     }
 }
