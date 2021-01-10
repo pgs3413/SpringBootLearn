@@ -46,6 +46,8 @@ ServletRegistrationBean FilterRegistrationBean ServletListenerRegistrationBean
 查看日志：docker logs container-id
 启动mysql:docker run -p 3306:3306 --name some-mysql --restart always -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
    参数设定：--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+进入容器内：docker exec -it container-id bash
+
 
 8.数据访问
 SpringBoot默认支持的数据源：
@@ -99,3 +101,59 @@ CacheManager管理多个Cache组件，对缓存的CRUD操作在Cache组件中，
 Service类上： @CacheConfig 抽取缓存的公共配置 @CacheConfig(cacheNames="xx")
 
 开发中使用缓存中间件：redis
+
+redis数据结构：
+key-string 最常用的，一般用于存储一个值, key-hash 存储一个对象数据, key-list 使用list结构实现栈和队列结构,
+key-set 交集，差集和并集的操作, key-zset 排行榜，积分存储操作
+
+string常用命令：
+1.set key value
+2.get key
+3.mset key value [key value...]
+4.mset key [key..]
+5.自增命令 incr key
+6.自减命令 decr key
+7.自增或自减指定数量：incrby/decrby key increment
+8.设置值的同时，指定生存时间 setex key second value
+9.设置值，如果当前key不存在的话 setnx key value
+10.在key对应的value后，追加内容 append key value
+11.查看value字符串的长度 strlen key
+
+hash结构常用命令：
+1.存储数据 hset key field value           hset person name pan , hset person age 18
+2.获取数据 hset key field                 hget person name
+3.批量操作 hmset key field value [field value..] hmget key field [field ..]        hmset person name pan age 18 ,  hmget person name age
+4.自增指定的值，可负数：hincrby key fieldincrement
+5.设置值，如果当前key不存在的话 hsetnx key field value
+6.检查field是否存在：hexists key field
+7.删除key对应的某一个field：hdel key field [field..]
+8.获取当前hash结构中的全部field和value：hgetall key
+9.获取当前hash结构中的全部field:hkeys key
+10.获取当前hash结构中的全部value：hvals key
+11.获取当前hash结构中field的数量：hlen key
+
+list结构命令：
+1.存储数据 从左侧插入数据 : lpush key value [value ..] 从右侧插入数据:rpush key value [value ..]
+    如果key存在且为list:lpushx key value , rpushx key value  指定索引位置(覆盖原来位置的数据) ：lset key index value
+2.获取数据  弹栈方式获取数据：左侧 lpop key 右侧 rpop key 获取指定索引范围的数据(start从0开始，stop输入-1,代表最后一个，-2倒数第二个): lrange key start stop
+            获取指定索引位置的数据 lindex key index 获取整个列表的长度 llen key
+3.删除数据 删除列表中count个value值 count>0 从左删 count=0 删除全部 count<0 从右删 lrem key count value
+            保留指定访问内的数据 ltrim key start stop
+            将一个列表中最后一个数据插入到另外一个列表的头部位置 rpoplpush list1 list2
+
+set结构命令：
+1.存储数据 sadd key member [member ..]
+2.获取全部数据 smembers key
+3.随机获取一个数据 spop key [count] 这个数据也会移除这个数据
+4.交集 sinter set1 set2 ..
+5.并集 sunion set1 set2 ..
+6.差集 sdiff set1 set2 ..
+7.删除指定的数据 srem key member [menber..]
+8.查看当前的set集合中是否包含指定值 sismember key member
+
+
+
+
+
+
+
