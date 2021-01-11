@@ -44,7 +44,7 @@ ServletRegistrationBean FilterRegistrationBean ServletListenerRegistrationBean
 运行镜像：docker run --name container-name -d image-name -p xxxx:xxxx -name：自定义容器名 -d:后台运行 -p 端口映射 主机端口:docker端口
 查看运行：docker ps -a 停止运行：docker stop container-id 开始运行：docker start container-id 删除容器：docker rm container-id
 查看日志：docker logs container-id
-启动mysql:docker run -p 3306:3306 --name some-mysql --restart always -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
+启动mysql:docker run -p 3306:3306 --name some-mysql --restart always -e MYSQL_ROOT_PASSWORD=my-secret-pw -v 主机配置文件：docker配置文件 -d mysql:tag
    参数设定：--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 进入容器内：docker exec -it container-id bash
 
@@ -151,6 +151,73 @@ set结构命令：
 7.删除指定的数据 srem key member [menber..]
 8.查看当前的set集合中是否包含指定值 sismember key member
 
+zset结构命令 (sorted set):
+1.添加数据 zadd key score menber [score menber..] score为数值 member不允许重复
+2.修改member的score： zincrby key increment member
+3.查看member的score：zscore key member
+4.获取zset中数据的数量：zcard key
+5.根据score的范围查询member数量 zcount key min max
+6.删除zset中的成员：zrem key member [member..]
+7.根据分数从小到大排序，获取指定范围内的数据：zrange key start stop [withscores]
+8.根据分数从大到小排序，获取指定范围内的数据：zrevrange key start stop [withscores]
+9.根据分数的范围获取数据：zrangebyscore key min max [withscores] [limit offset count]
+10.zrangebyscore key max min [withscores] [limit offset count] +inf最大值 -inf最小值
+
+key常用命令：
+1.查看redis中的全部的key  keys pattern(*,xxx*)
+2.查看某一个key是否存在 exists key
+3.删除key del key [key..]
+4.设置key的生存时间 秒 expire key second 毫秒 pexpire key milliseconds 指定时间 expireat key timestamp , pexpireat key milliseconds
+5.查看key的剩余生存时间 ttl key , pttl key (返回-2 key不存在 -1 当前key没有设置生存时间)
+6.移除key的生存时间 persist key
+7.选择操作的库 select 0~15
+8.移动key到另外一个库中 move key db
+
+db库的常用命令：
+1.清空当前所在的库 flushdb
+2.清空全部数据库 flushall
+3.查看当前数据库中有多少个key dbsize
+4.查看最后一次操作的时间 lastsave
+5.实时监控redis服务接受到的目录 monitor
+
+java连接redis : jedis , Lettuce
+
+Jedis连接redis
+1.连接redis  Jedis jedis = new Jedis(ip , port)
+2.操作redis  调用jedis的方法
+3.释放资源  jedis.clos()
+
+jedis如何存储一个对象到redis中
+以byte[]形式存储到redis中 ：使用Spring中的SerializationUtils.serialize()序列化key和value
+以字节数组的形式获得对象 byte[] value=jedis.get(byte[] key) 反序列化 Object obj=SerializationUtils.deserialize(value)
+以String的形式存储对象 ：将对象转换为json对象
+
+jedis连接池
+1.创建连接池 JedisPool pool=new JedisPool(ip,6379)
+    配置连接池信息 GenericObjectConfig类 以构造方式传入JedisPool
+2.通过连接池获得jedis对象 Jedis jedis=pool.getResource()
+3.操作
+4.释放资源
+
+redis管道操作 执行大量命令
+获得管道 Pipeline p=jedis.pipelined() 调用p的方法,将命令放到管道中 p.incr(xx) 执行方法 p.syncAndReturnAll()
+
+AUTH : 配置文件 requirepass 密码 ， 命令行 Config set requirepass 密码， auth 密码
+jedis : jedis.auth(xx) ， 在new JedisPool时指定密码
+
+redis事务：开启事务 multi 执行事务 exec 取消事务 discard 监听 watch key [key..]
+
+redis持久化机制 允许，推荐同时开启 优先选择AOF文件
+    RDB : 写进配置文件 默认开启
+        save 900 1 # 900秒之内，有一个key改变了，就进行RDB持久化
+        rdbcompression # 开启RDB持久化压缩
+        dbfilename redis.rdb # RDB持久化文件的名称
+    AOF : 写进配置文件 默认关闭 更安全
+        appendonly yes #代表开启AOF持久化
+        appendfilename "redis.aof" #AOF文件的名称
+        appendfsync always(everysec , no)  #AOF持久化执行的时机
+
+redis的主从架构 哨兵模式 集群
 
 
 
