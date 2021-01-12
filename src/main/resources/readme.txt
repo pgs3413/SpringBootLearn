@@ -219,6 +219,43 @@ redis持久化机制 允许，推荐同时开启 优先选择AOF文件
 
 redis的主从架构 哨兵模式 集群
 
+Springboot整合redis
+默认jdk序列化机制
+引入redis的starter，容器中保存的是RedisCacheManager。RedisCacheManager帮我们创建RedisCache来作为缓存组件，RedisCache通过操作redis来缓存数据
+springboot1.x中：底层使用redisTemplate
+springboot2.x中：key采用StringRedisSerializer序列化，value采用jdk序列化，所以自定义RedisTemplate是没有效果的，需要配置RedisCacheConfiguration才行
+
+二、SpringBoot与消息
+
+大多应用中，可通过消息服务中间件来提升系统异步通信，扩展解耦能力
+消息服务中两个重要概念：消息代理(message broker)和目的地(destination)，当消息发送者发送消息以后，将由消息代理接管，消息代理保证消息传递到指定目的地
+消息队列主要有两种形式的目的地：
+    1.队列(queue):点对点消息通信
+    2.主题(topic):发布(publish)/订阅(subscribe) 消息通信
+JMS , AMQP
+
+RabbitMQ (基于AMQP):
+核心概念：
+    1.message:消息，消息是不具名的，它由消息头和消息体组成。消息体是不透明的，而消息头则有一系列的可选属性组成，包括：routing-key,priority,delivery-mode
+    2.publisher:消息的生产者，也是一个向交换器发布消息的客户端应用程序
+    3.exchage:交换器，用来接受生产者发送的消息并将这些消息路由给服务器中的队列。exchange有4种类型：direct(单播),fanout(广播),topic(组播),headers(不用)
+    4.queue:消息队列，用来保存消息直到发送给消费者。它是消息的容器，也是消息的终点。一个消息可投入一个或多个队列。消息一直在队列里面，等待消费者连接到这个队列将其取走
+    5.binding:绑定，用于消息队列和交换器之间的关联。一个绑定就是基于路由键将交换器和消息队列连接起来的路由规则，所以可以将交换器理解成一个由绑定构成的路由表。exchange和queue的绑定可以是多对多的关系
+    6.connection:网络连接，比如一个TCP连接
+    7.channel:信道，多路复用连接中的一条独立的双向数据流管道。一条TCP连接有多个信道。AMQP命令都是通过信道发出来的。
+    8.consumer:消息的消费者，表示一个从消息队列中取得消息的客户端应用程序。
+    9.virtual host:虚拟主机，表示一批交换器，消息队列和相关对象。每个vhost本质上就是一个mini版的rabbitMQ服务器。必须在连接时指定，默认为/
+    10.broker: 表示消息队列服务器实体
+
+自动配置：
+    1.RabbitAutoConfiguration
+    2.自动配置了连接工厂ConnectionFactory
+    3.RabbitProperties 封装了RabbitMQ的配置
+    4.RabbitTemplate 给RabbitMQ发送和接受消息
+    5.AmqpAdmin RabbitMQ系统管理功能组件
+
+1.rabbitTemplate.send(exchange,routeKey,Message) Message需要自己构造一个，定义消息体内容和消息头
+2.rabbitTemplate.convertAndSend(exchange,routeKey,object) 自动序列化
 
 
 
