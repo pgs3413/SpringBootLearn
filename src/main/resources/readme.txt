@@ -257,7 +257,110 @@ RabbitMQ (基于AMQP):
 1.rabbitTemplate.send(exchange,routeKey,Message) Message需要自己构造一个，定义消息体内容和消息头
 2.rabbitTemplate.convertAndSend(exchange,routeKey,object) 自动序列化
 
+启动类上加@EnableRabbit
+Service层方法加@RabbitListener(queues = "xx") 监听消息队列
+可将消息封装成Message类，可得到消息头
 
+AmqpAdmin:创建和删除Queue , Exchange
 
+三、Springboot与检索
 
+ElasticSearch
+    全文搜索引擎，可以快速的存储，搜索和分析海量的数据；
+    分布式搜索服务，提供Restful API,底层基于Lucene
 
+保存数据：
+    发起PUT请求 http://192.168.1.247:9200/pan/_doc/1
+    body：
+        {
+            "name":"pan",
+            "age":18,
+            "about":"I love to go rock climbing", #后加
+            "interests":["sports","music"]
+        }
+
+    response:
+        {
+            "_index": "pan",
+            "_type": "_doc",
+            "_id": "1",
+            "_version": 1,
+            "result": "created",
+            "_shards": {
+                "total": 2,
+                "successful": 1,
+                "failed": 0
+            },
+            "_seq_no": 0,
+            "_primary_term": 1
+        }
+
+检索文档：
+    发起GET请求 http://192.168.1.247:9200/pan/_doc/1
+    response:
+        {
+            "_index": "pan",
+            "_type": "_doc",
+            "_id": "1",
+            "_version": 1,
+            "_seq_no": 0,
+            "_primary_term": 1,
+            "found": true,
+            "_source": {
+                "name": "pan",
+                "age": 18,
+                "about": "I love to go rock climbing",
+                "interests": [
+                    "sports",
+                    "music"
+                ]
+            }
+        }
+
+删除数据：发起DELETE请求 http://192.168.1.247:9200/pan/_doc/1
+
+检查数据是否存在：发起HEAD请求 http://192.168.1.247:9200/pan/_doc/1
+    200 存在 404 不存在
+
+查询所有数据：发起GET请求 http://192.168.1.247:9200/pan/_doc/_search
+复杂查询：发起GET请求
+        1.http://192.168.1.247:9200/pan/_doc/_search?q=name:pan
+        2.POST http://192.168.1.247:9200/pan/_doc/_search
+          body:
+            {
+            "query":{
+                "match":{
+                "name":"pan"
+                }
+            }
+            }
+
+        关键字查询：(全文检索)
+            body:
+                {
+                    "query":{
+                         "match":{
+                              "about":"rock climbing"
+                                }
+                            }
+                }
+        完整搜索：使用"match_phrase"
+
+springboot整合elasticsearch
+默认两种技术来和ES交互：
+    1.Jest（默认不生效）springboot2.x弃用
+    2.SpringData ElasticSearch
+        1) 提供了 Client类 节点信息 clusterNodes , clusterName
+        2) 提供了 ElasticsearchTemplate
+        3) 提供了 ElasticsearchRepository接口 使用该接口的子接口操作ES
+
+四、SpringBoot与任务
+
+1.异步任务
+在Service层方法上加@Async 在启动类上加@EnableAsync
+
+2.定时任务
+在定时方法上加@Scheduled(cron = "*秒 *分 *时 *日 *月 *周") 启动类上加@EnableScheduling
+cron写法：, 枚举 - 区间 * 任意 / 步长 ? 日、周冲突匹配
+
+3.邮件任务

@@ -11,6 +11,12 @@ spring:
     password: 123456
   rabbitmq:
     host: 192.168.1.247
+  mail:
+    username: 2113114379@qq.com
+    password: npsqfahfhytxdbcc
+    host: smtp.qq.com
+
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: com.pan.SpringBootLearn.pojo
+
