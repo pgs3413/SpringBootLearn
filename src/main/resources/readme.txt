@@ -12,9 +12,11 @@ PropertySource(value="classpath:xx.properties")
 在对象的属性上加 @NotNull(message="xx") @Min ..
 在Controller的方法的形参中加@Valid 信息保存在BindingResult中
 
-4.
-@RequestMapping("/test03/{name}"}
-@PathVariable("name") 放在形参前
+4.SpringMVC常用注解
+@RequestMapping("/test03/{name}"} @GetMapping("xx")
+@RequestParam("xx")   @RequestParam("xx") @RequestHeader("User-Agent") @RequestBody
+@CookieValue("xx") @RequestAttribute("xx") @PathVariable("name") 放在形参前
+@MatrixVariable("jsessionid") /abc;jsessionid=xx;xx=xx,xx,xx 开启需要配置UrlPathHelper
 
 5.
 restful风格
@@ -38,7 +40,15 @@ GetMapping PostMapping PutMapping DeleteMapping
 7.注册 Servlet Filter Listener
 ServletRegistrationBean FilterRegistrationBean ServletListenerRegistrationBean
 
-8.docker
+8.单文件与多文件的上传
+html书写：
+<form action="" method="post" enctype="multipart/form-data">
+    <input type="file" name="single"><br>
+    <input type="file" name="multi" multiple>
+</form>
+FileController
+
+9.docker
 安装 yum install docker 启动:systemctl start/enable docker 查询：docker search mysql
 拉取：docker pull mysql:5.5 查看镜像：docker images 删除镜像：docker rmi image-id
 运行镜像：docker run --name container-name -d image-name -p xxxx:xxxx -name：自定义容器名 -d:后台运行 -p 端口映射 主机端口:docker端口
@@ -49,7 +59,7 @@ ServletRegistrationBean FilterRegistrationBean ServletListenerRegistrationBean
 进入容器内：docker exec -it container-id bash
 
 
-8.数据访问
+10.数据访问
 SpringBoot默认支持的数据源：
 默认启动执行 initialization-mode: always
 建表sql文件:schema.sql 指定路径 schema: -classpath:xx.sql 普通sql文件:data.sql
@@ -59,14 +69,14 @@ SpringBoot1.x:
          注册一个StatViewServlet
 SpringBoot2.x:可在配置文件中配置
 
-9.整合MyBatis
+10.整合MyBatis
 注解版：
     不需要在配置文件中额外配置 自定义MyBatis的配置规则，给容器中添加一个ConfigurationCustomizer
     @MapperScan(value="com.pan.SpringBootLearn.mapper") 可加在启动类上
 配置文件版：
     接口+xml文件，接口要加@Mapper 在配置文件中指定xml路径
 
-10.Spring Data JPA (类似MyBatisPlus，不用写基本的sql语句）
+11.Spring Data JPA (类似MyBatisPlus，不用写基本的sql语句）
 实体类相关注解：ORM
  类上 @Entity @Table(name="xxx") 省略默认表名为类名
  属性上 @Id @GeneratedValue(strategy=GenerationType=IDENTITY) @Column(name ="xxx") name可省略
@@ -364,3 +374,44 @@ springboot整合elasticsearch
 cron写法：, 枚举 - 区间 * 任意 / 步长 ? 日、周冲突匹配
 
 3.邮件任务
+
+五、SpringBoot与安全
+
+应用程序的两个主要区域是 认证 和 授权
+认证(authentication):是建立一个他声明的主体的过程
+授权(authorization):指确定一个主体是否允许在你的应用程序执行一个动作的过程
+
+Spring Security 在配置类里配置
+
+六、SpringBoot 与 分布式
+
+zookeeper+dubbo
+zookeeper:是一个为分布式应用提供一致性服务的软件 （注册中心）
+dubbo:分布式服务框架
+1.将服务注册到注册中心
+    1）引入dubbo和zkclient相关依赖
+    2）配置dubbo的扫描包和注册中心地址
+    3）使用@Service发布服务
+2)消费者使用服务
+    1）引入dubbo和zkclient相关依赖
+    2）配置dubbo注册中心地址
+    3）引用服务 @Reference
+
+SpringBoot+SpringCloud
+
+SpringCloud是一个分布式的整体解决方案。为开发者提供了在分布式系统（配置管理，服务发现，熔断，路由，微代理，控制总线，
+一次性token，全局锁，leader选举，分布式Session，集群状态）中快速构建的工具，开发者可以快速的启动服务或构建应用，同时能够
+快速和云平台资源进行对接。
+
+SpringCloud分布式开发五大组件：
+1.服务发现--Netflix Eureka (注册中心)
+2.客服端负载均衡--Netflix Ribbon
+3.断路器--Netflix Hystrix
+4.服务网关--Netflix Zuul
+5.分布式配置--Spring Cloud Config
+
+七、SprintBoot 与 监控
+1.引入spring-boot-starter-actuator
+2.management.endpoints.web.exposure.include=*
+3.http访问 /health /auditevents /beans /info /dump /autoconfig /trace /headdump /mappings /metrics /env /loggers /configprops
+POST请求  /shutdown 需配置：management.endpoints.shutdown.enabled=true

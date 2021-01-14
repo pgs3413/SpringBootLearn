@@ -33,8 +33,10 @@ public class MyMvcConfig{
             //视图控制器
             @Override
             public void addViewControllers(ViewControllerRegistry registry) {
-                registry.addViewController("/success2").setViewName("success");
+                registry.addViewController("/success").setViewName("success");
                 registry.addViewController("/put").setViewName("put");
+                registry.addViewController("/pan").setViewName("pan");
+                registry.addViewController("/file").setViewName("file");
             }
 
             @Override
